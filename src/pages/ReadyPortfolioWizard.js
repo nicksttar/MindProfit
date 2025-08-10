@@ -2,6 +2,36 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import '../App.css'; 
 
+// --- Вспомогательные компоненты ---
+
+// Компонент для модального окна, скопированный из ActivePortfolios.js
+const Modal = ({ isOpen, onClose, title, children }) => {
+    if (!isOpen) return null;
+
+    return (
+        <div style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.7)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1050,
+        }}>
+            <div className="stat-card p-4" style={{ width: '100%', maxWidth: '500px', height: 'auto' }}>
+                <div className="d-flex justify-content-between align-items-center mb-4">
+                    <h5 className="fw-bold mb-0">{title}1</h5>
+                    <button onClick={onClose} className="btn-close btn-close-white"></button>
+                </div>
+                <div>{children}</div>
+            </div>
+        </div>
+    );
+};
+
 const portfolios = [
     { id: 'm10', name: 'M-10', description: 'Топ 10 монет по капитализации.' },
     { id: 'm25', name: 'M-25', description: 'Расширенный список из 25 криптовалют.' },
@@ -26,6 +56,9 @@ export default function ReadyPortfolioWizard({ userId, hasBinanceKeys, onPortfol
     const [apiSecret, setApiSecret] = useState('');
     const [apiError, setApiError] = useState('');
 
+    // ИЗМЕНЕНО: Состояние для модального окна подтверждения
+    const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+
     const startWizard = () => setIsWizardActive(true);
 
     const resetWizard = () => {
@@ -42,11 +75,8 @@ export default function ReadyPortfolioWizard({ userId, hasBinanceKeys, onPortfol
     const handleBack = () => {
         setApiError('');
         if (step > 1) {
-            if (step === 4 && hasBinanceKeys) {
-                setStep(2);
-            } else {
-                setStep(step - 1);
-            }
+            if (step === 4 && hasBinanceKeys) setStep(2);
+            else setStep(step - 1);
         } else {
             resetWizard();
         }
@@ -101,30 +131,38 @@ export default function ReadyPortfolioWizard({ userId, hasBinanceKeys, onPortfol
         }
     };
 
-    const handleCreatePortfolio = async () => {
+    // ИЗМЕНЕНО: Эта функция теперь только открывает модальное окно
+    const handleCreatePortfolio = () => {
         const amount = parseFloat(investmentAmount);
         if (!amount || amount <= 0) return setApiError("Введите корректную сумму.");
         if (amount > usdtBalance) return setApiError("Сумма превышает доступный баланс.");
         
         setApiError('');
+        setIsConfirmModalOpen(true); // Открываем модальное окно
+    };
+    
+    // ИЗМЕНЕНО: Новая функция для подтверждения создания из модального окна
+    const handleConfirmCreate = async () => {
         setIsLoading(true);
         try {
             const { data } = await axios.post('/api/binance/purchase', {
                 userId,
                 portfolioType: selectedPortfolio.name,
-                amount
+                amount: parseFloat(investmentAmount)
             });
             if (data.success) {
                 alert(`Портфель "${selectedPortfolio.name}" успешно создан!`);
                 resetWizard();
                 if (onPortfolioCreated) {
-                    onPortfolioCreated(); // Вызываем колбэк для обновления списка
+                    onPortfolioCreated();
                 }
             }
         } catch (err) {
-            setApiError(err.response?.data?.error || 'Не удалось создать портфель.');
+            // Ошибку покажем в alert, так как модальное окно закроется
+            alert(err.response?.data?.error || 'Не удалось создать портфель.');
         } finally {
             setIsLoading(false);
+            setIsConfirmModalOpen(false);
         }
     };
 
@@ -219,6 +257,24 @@ export default function ReadyPortfolioWizard({ userId, hasBinanceKeys, onPortfol
                      </div>
                  </div>
             )}
+
+            {/* ИЗМЕНЕНО: Модальное окно для подтверждения создания портфеля */}
+            <Modal 
+                isOpen={isConfirmModalOpen} 
+                onClose={() => setIsConfirmModalOpen(false)} 
+                title="Подтверждение операции"
+            >
+                <p style={{color: '#9CA3AF'}}>
+                    Вы собираетесь создать портфель "{selectedPortfolio?.name}" на сумму <strong>{investmentAmount} USDT</strong>.
+                    Средства будут списаны с вашего баланса на {selectedExchange?.name}. Продолжить?
+                </p>
+                <div className="d-flex justify-content-end gap-2 mt-4">
+                    <button onClick={() => setIsConfirmModalOpen(false)} className="btn btn-outline-light">Отмена</button>
+                    <button onClick={handleConfirmCreate} className="btn btn-primary" disabled={isLoading}>
+                        {isLoading ? 'Выполнение...' : 'Да, создать'}
+                    </button>
+                </div>
+            </Modal>
         </div>
     );
 }

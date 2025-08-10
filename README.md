@@ -1,70 +1,23 @@
-# Getting Started with Create React App
+MindProfit 💸MindProfit — это интуитивно понятное веб-приложение для учета личных доходов и расходов. Сервис помогает пользователям легко контролировать свои финансы, анализировать траты по категориям и принимать взвешенные финансовые решения.🚀 Основные возможности🔐 Аутентификация: Безопасная регистрация и вход в систему с использованием JWT-токенов.📊 Дашборд: Наглядное представление текущего баланса, общих доходов и расходов.💸 Управление транзакциями: Простое добавление, редактирование и удаление операций (доходы и расходы).🗂️ Категоризация: Возможность присваивать категории каждой транзакции для детального анализа.📈 Визуализация: Графики и диаграммы для анализа финансовых потоков по периодам и категориям.📱 Адаптивный дизайн: Корректное отображение на любых устройствах — от десктопов до смартфонов.🛠️ Стек технологийЭтот проект построен с использованием современного стека технологий MERN (MongoDB, Express, React, Node.js).Бэкенд:Node.js - Среда выполнения JavaScript.Express - Фреймворк для создания веб-приложений и API.MongoDB - NoSQL база данных для хранения информации.Mongoose - ODM для работы с MongoDB.JSON Web Token (JWT) - Для обеспечения безопасности и аутентификации пользователей.Dotenv - Для управления переменными окружения.Фронтенд:React - Библиотека для создания пользовательских интерфейсов.Redux Toolkit - Для управления состоянием приложения.React Router - Для навигации по приложению.Styled Components - Для стилизации компонентов.Axios - Для выполнения HTTP-запросов к бэкенду.⚙️ Установка и запускЧтобы запустить проект локально, выполните следующие шаги:1. Клонируйте репозиторий:git clone https://github.com/nicksttar/MindProfit.git
+cd MindProfit
+2. Настройка бэкенда:# Перейдите в папку server
+cd server
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# Установите зависимости
+npm install
 
-## Available Scripts
+# Создайте файл .env в корне папки /server и добавьте переменные:
+# PORT - порт, на котором будет работать сервер (например, 5000)
+# MONGO_URI - строка подключения к вашей базе данных MongoDB
+# JWT_SECRET - ваш секретный ключ для генерации токенов
+Пример файла .env для сервера:PORT=5000
+MONGO_URI=mongodb+srv://<user>:<password>@cluster.mongodb.net/mindprofit?retryWrites=true&w=majority
+JWT_SECRET=your_super_secret_key_123
+3. Настройка фронтенда:# Вернитесь в корень проекта и перейдите в папку client
+cd ../client
 
-In the project directory, you can run:
-
-### `npm start`
-
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
-
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
-
-### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+# Установите зависимости
+npm install
+4. Запуск проекта:Вам нужно будет запустить два терминала.В первом терминале (в папке /server):npm start
+Сервер запустится на порту, указанном в вашем .env файле.Во втором терминале (в папке /client):npm start
+Клиентское приложение React запустится на http://localhost:3000.После этого откройте http://localhost:3000 в вашем браузере.

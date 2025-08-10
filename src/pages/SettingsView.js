@@ -1,26 +1,33 @@
 // src/components/SettingsView.js
 
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import '../App.css'; 
 
 const Icon = ({ name }) => <i className={`bi bi-${name}`} style={{ marginRight: '10px' }}></i>;
 
 // Компонент теперь принимает userId от родителя (Dashboard.js)
-export default function SettingsView({ userId }) {
+export default function SettingsView({ userId, setUserId }) {
   const [activeTab, setActiveTab] = useState('profile');
   const [currentPlan, setCurrentPlan] = useState({ name: 'Бесплатный', price: 0 });
   
   const [userData, setUserData] = useState({ name: '', email: '' });
   const [connectedExchanges, setConnectedExchanges] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
 
   const allExchanges = [
     { id: 'binance', name: 'Binance', logo: '/img/binance.png' },
     { id: 'okx', name: 'OKX', logo: '/img/okx.png' },
-    { id: 'bybit', name: 'Bybit', logo: 'https://upload.wikimedia.org/wikipedia/commons/f/f4/Bybit_logo.svg' },
+    { id: 'bybit', name: 'Bybit', logo: '/img/bybit.svg' },
   ];
+
+const handleLogout = () => {
+  localStorage.removeItem('mindProfitUserId');
+  setUserId(null);
+  navigate('/'); // Эта строка выполняет перенаправление
+};
 
   // Функция для загрузки данных вынесена отдельно
   const fetchUserData = async () => {
@@ -90,7 +97,7 @@ export default function SettingsView({ userId }) {
             <Icon name="bell-fill" /> Уведомления
           </button>
           <hr className="my-3" style={{borderColor: 'rgba(255,255,255,0.2)'}}/>
-          <button className="logout-btn-header" style={{width: '100%'}}>
+          <button className="logout-btn-header" style={{width: '100%'}} onClick={handleLogout}>
             <Icon name="box-arrow-right" /> Выход
           </button>
         </div>
@@ -100,15 +107,15 @@ export default function SettingsView({ userId }) {
             <div className="settings-section">
               <h4>Профиль пользователя</h4>
               <div className="mb-3">
-                <label htmlFor="userName" className="form-label">Имя пользователя</label>
-                <input type="text" id="userName" className="form-control" defaultValue={userData.name} />
+                <label htmlFor="userIdField" className="form-label ">Ваш ID</label>
+                <input type="text" id="userIdField" className="form-control text-secondary" value={userId || ''} disabled />
+                <div className="form-text text-secondary">Это ваш уникальный идентификатор в системе.</div>
               </div>
               <div className="mb-3">
                 <label htmlFor="userEmail" className="form-label">Email</label>
                 <input type="email" id="userEmail" className="form-control" value={userData.email} disabled />
-                <div className="form-text">Email используется для входа и не может быть изменен.</div>
               </div>
-              <button className="btn btn-primary">Сохранить изменения</button>
+              <button className="btn btn-primary">Изменить Почту</button>
             </div>
           )}
 
@@ -174,11 +181,6 @@ export default function SettingsView({ userId }) {
                 </div>
                 <button className="btn btn-primary">Сменить пароль</button>
               </div>
-              <div className="settings-section">
-                  <h4>Двухфакторная аутентификация (2FA)</h4>
-                  <p style={{color: '#9CA3AF'}}>Защитите свой аккаунт с помощью дополнительного уровня безопасности.</p>
-                  <button className="btn btn-outline-light">Настроить 2FA</button>
-              </div>
             </>
           )}
 
@@ -197,7 +199,7 @@ export default function SettingsView({ userId }) {
                         return (
                             <li key={ex.id} className="list-group-item d-flex align-items-center" style={{backgroundColor: 'transparent', borderBottom: '1px solid #30363D', paddingLeft: 0, paddingRight: 0}}>
                                 <img src={ex.logo} alt={`${ex.name} logo`} style={{width: '24px', marginRight: '15px'}} />
-                                <span className="fw-bold flex-grow-1">{ex.name}</span>
+                                <span className="fw-bold flex-grow-1 text-light">{ex.name}</span>
                                 {isConnected ? (
                                   <>
                                     <span className="badge bg-success me-3">Подключено</span>

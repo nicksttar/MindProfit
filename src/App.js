@@ -64,7 +64,7 @@ function AppHeader({ activeView, setActiveView, onLogout }) {
   return (
     <header className="app-header">
       <div className="container-xl d-flex justify-content-between align-items-center">
-        <h4 className="logo mb-0">Mind Profit</h4>
+        <h4 className="logo mb-0" role="button" onClick={() => setActiveView("dashboard") }>Mind Profit</h4>
         <nav className="main-nav">
           <button className={`nav-button ${activeView === "dashboard" ? "active" : ""}`} onClick={() => setActiveView("dashboard")}>Портфели</button>
           <button className={`nav-button ${activeView === "academy" ? "active" : ""}`} onClick={() => setActiveView("academy")}>Академия</button>
@@ -134,7 +134,7 @@ function AppLayout() {
           <Route path="/login" element={<Login onLoginSuccess={handleLoginSuccess} onToggle={() => navigate('/register')} />} />
           <Route path="/dashboard/*" element={
             <ProtectedRoute userId={userId}>
-              <Dashboard activeView={activeDashboardView} setActiveView={setActiveDashboardView} userId={userId} />
+              <Dashboard activeView={activeDashboardView} setActiveView={setActiveDashboardView} userId={userId} setUserId={setUserId} />
             </ProtectedRoute>
           }/>
         </Routes>

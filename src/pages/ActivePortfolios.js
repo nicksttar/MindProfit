@@ -1,24 +1,42 @@
 // src/components/ActivePortfolios.js
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 import '../App.css'; 
 
 // --- Вспомогательные компоненты и функции ---
 
-// Компонент стрелки, использующий текстовый символ для 100% надежности отображения
+// Компонент для модального окна
+const Modal = ({ isOpen, onClose, title, children }) => {
+    if (!isOpen) return null;
+
+    return (
+        <div style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.7)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1050,
+        }}>
+            <div className="stat-card p-4" style={{ width: '100%', maxWidth: '500px', height: 'auto', backgroundColor: '#161B22', borderRadius: '8px' }}>
+                <div className="d-flex justify-content-between align-items-center mb-4">
+                    <h5 className="fw-bold mb-0">{title}</h5>
+                    <button onClick={onClose} className="btn-close btn-close-white"></button>
+                </div>
+                <div>{children}</div>
+            </div>
+        </div>
+    );
+};
+
+
 const ArrowIcon = ({ isExpanded }) => (
-    <span 
-        style={{ 
-            display: 'inline-block',
-            transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)', 
-            transition: 'transform 0.3s ease',
-            cursor: 'pointer',
-            color: '#9CA3AF',
-            fontSize: '1.5rem',
-            lineHeight: '1'
-        }}
-    >
+    <span style={{ display: 'inline-block', transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', cursor: 'pointer', color: '#9CA3AF', fontSize: '1.5rem', lineHeight: '1' }}>
         ▼
     </span>
 );
@@ -39,34 +57,65 @@ const calculateDaysActive = (dateString) => {
 // --- Основной компонент ---
 
 export default function ActivePortfolios({ userId, portfolios, isLoading, error, onUpdate }) {
-    // Состояние для отслеживания открытого портфеля
     const [expandedPortfolioId, setExpandedPortfolioId] = useState(null);
+    
+    // Состояния для управления модальными окнами
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+    const [isSellModalOpen, setIsSellModalOpen] = useState(false);
+    const [selectedPortfolio, setSelectedPortfolio] = useState(null);
+    const [amountToAdd, setAmountToAdd] = useState('');
 
     const handleToggleDetails = (portfolioId) => {
         setExpandedPortfolioId(currentId => (currentId === portfolioId ? null : portfolioId));
     };
 
-    const handleSellPortfolio = async (portfolioId, portfolioType) => {
-        if (window.confirm(`Вы уверены, что хотите зафиксировать портфель "${portfolioType}"?`)) {
-            try {
-                await axios.post('http://localhost:5000/api/binance/sell', { userId, portfolioId });
-                alert('Портфель успешно зафиксирован!');
-                if (onUpdate) onUpdate();
-            } catch (err) {
-                alert(err.response?.data?.error || 'Не удалось зафиксировать портфель.');
-                if (err.response?.status === 409 && onUpdate) onUpdate();
-            }
+    // --- Логика для модальных окон ---
+    
+    // Открыть модальное окно продажи
+    const openSellModal = (portfolio) => {
+        setSelectedPortfolio(portfolio);
+        setIsSellModalOpen(true);
+    };
+
+    // Открыть модальное окно добавления средств
+    const openAddFundsModal = (portfolio) => {
+        setSelectedPortfolio(portfolio);
+        setAmountToAdd(''); // Сбрасываем инпут
+        setIsAddModalOpen(true);
+    };
+
+    // Закрыть все модальные окна
+    const closeModal = () => {
+        setIsAddModalOpen(false);
+        setIsSellModalOpen(false);
+        setSelectedPortfolio(null);
+    };
+
+    // Подтверждение продажи
+    const handleConfirmSell = async () => {
+        if (!selectedPortfolio) return;
+        try {
+            await axios.post('http://localhost:5000/api/binance/sell', { userId, portfolioId: selectedPortfolio._id });
+            alert('Портфель успешно зафиксирован!');
+            if (onUpdate) onUpdate();
+        } catch (err) {
+            alert(err.response?.data?.error || 'Не удалось зафиксировать портфель.');
+            if (err.response?.status === 409 && onUpdate) onUpdate();
+        } finally {
+            closeModal();
         }
     };
 
-    const handleAddFunds = (portfolioId, portfolioType) => {
-        const amountToAdd = prompt(`Какую сумму в USDT вы хотите добавить в портфель "${portfolioType}"?`);
-        if (amountToAdd && !isNaN(amountToAdd) && parseFloat(amountToAdd) > 0) {
-            alert(`${amountToAdd} USDT будет добавлено в портфель. (Функционал в разработке)`);
-        } else if (amountToAdd !== null) {
+    // Подтверждение добавления средств
+    const handleConfirmAddFunds = () => {
+        if (!selectedPortfolio || !amountToAdd || isNaN(amountToAdd) || parseFloat(amountToAdd) <= 0) {
             alert("Пожалуйста, введите корректную сумму.");
+            return;
         }
+        alert(`Добавление ${amountToAdd} USDT в портфель "${selectedPortfolio.type}". (Функционал в разработке)`);
+        closeModal();
     };
+
 
     if (isLoading) return <div className="text-center p-5"><div className="spinner-border text-primary" role="status"></div></div>;
     if (error) return <div className="stat-card p-4 text-center text-danger">{error}</div>;
@@ -93,7 +142,6 @@ export default function ActivePortfolios({ userId, portfolios, isLoading, error,
 
                         return (
                             <div key={p._id} className="stat-card p-4">
-                                {/* Основная информация о портфеле */}
                                 <div className="row align-items-center g-3">
                                     <div className="col-lg-3 col-md-6">
                                         <h5 className="fw-bold mb-1">{p.type}</h5>
@@ -120,17 +168,16 @@ export default function ActivePortfolios({ userId, portfolios, isLoading, error,
                                             <div onClick={() => handleToggleDetails(p._id)} className="p-2">
                                                 <ArrowIcon isExpanded={isExpanded} />
                                             </div>
-                                            <button onClick={() => handleAddFunds(p._id, p.type)} className="btn btn-primary btn-sm flex-grow-1 flex-lg-grow-0">
+                                            <button onClick={() => openAddFundsModal(p)} className="btn btn-primary btn-sm flex-grow-1 flex-lg-grow-0">
                                                 Добавить
                                             </button>
-                                            <button onClick={() => handleSellPortfolio(p._id, p.type)} className="btn btn-outline-light btn-sm flex-grow-1 flex-lg-grow-0">
+                                            <button onClick={() => openSellModal(p)} className="btn btn-outline-light btn-sm flex-grow-1 flex-lg-grow-0">
                                                 Зафиксировать
                                             </button>
                                         </div>
                                     </div>
                                 </div>
-
-                                {/* Раскрывающийся блок с деталями */}
+                                
                                 <div style={{
                                     maxHeight: isExpanded ? '500px' : '0px',
                                     overflow: 'hidden',
@@ -163,6 +210,33 @@ export default function ActivePortfolios({ userId, portfolios, isLoading, error,
                     })}
                 </div>
             )}
+
+            {/* Модальное окно для добавления средств */}
+            <Modal isOpen={isAddModalOpen} onClose={closeModal} title={`Добавить в портфель "${selectedPortfolio?.type}"`}>
+                <div className="mb-3">
+                    <label className="form-label">Сумма для добавления (USDT)</label>
+                    <input 
+                        type="number" 
+                        className="form-control" 
+                        value={amountToAdd}
+                        onChange={(e) => setAmountToAdd(e.target.value)}
+                        placeholder="Например: 100"
+                    />
+                </div>
+                <div className="d-flex justify-content-end gap-2">
+                    <button onClick={closeModal} className="btn btn-outline-light">Отмена</button>
+                    <button onClick={handleConfirmAddFunds} className="btn btn-primary">Подтвердить</button>
+                </div>
+            </Modal>
+
+            {/* Модальное окно для подтверждения продажи */}
+            <Modal isOpen={isSellModalOpen} onClose={closeModal} title={`Зафиксировать портфель "${selectedPortfolio?.type}"`}>
+                <p style={{color: '#9CA3AF'}}>Вы уверены? Все активы в этом портфеле будут проданы по текущей рыночной цене. Это действие нельзя будет отменить.</p>
+                <div className="d-flex justify-content-end gap-2 mt-4">
+                    <button onClick={closeModal} className="btn btn-outline-light">Отмена</button>
+                    <button onClick={handleConfirmSell} className="btn btn-danger">Да, зафиксировать</button>
+                </div>
+            </Modal>
         </div>
     );
 }
