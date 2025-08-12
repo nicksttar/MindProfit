@@ -111,8 +111,8 @@ const EducationCard = ({ title, description, premium }) => (
 // Основной компонент раздела "Академия"
 export default function AcademyView() {
   return (
-    <div className="container-xl py-5">
-      <div className="text-center mb-5">
+    <div className="container-xl py-3">
+      <div className="text-center mb-3">
         <h2 className="fw-bold">🎓 Академия Mind Profit</h2>
         <p className="lead" style={{color: '#9CA3AF'}}>Ваш путь от новичка до эксперта в мире криптовалют.</p>
       </div>

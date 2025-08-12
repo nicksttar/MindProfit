@@ -7,6 +7,7 @@ import '../App.css'; // Подключаем общие стили
 import PortfolioView from './PortfolioView';
 import AcademyView from './AcademyView';
 import SettingsView from './SettingsView';
+import MainView from './MainView';
 
 /**
  * Контейнер для содержимого панели управления.
@@ -16,7 +17,7 @@ export default function Dashboard({ activeView, userId, setUserId }) {
   return (
     <main className="container-xl" style={{ paddingTop: "100px", paddingBottom: "50px" }}>
       {/* Условный рендеринг компонента в зависимости от activeView */}
-      {activeView === 'dashboard' && <PortfolioView userId={userId} />}
+      {activeView === 'dashboard' && <MainView userId={userId} />}
       {activeView === 'academy' && <AcademyView />}
       {activeView === 'settings' && <SettingsView userId={userId} setUserId={setUserId} />}
     </main>

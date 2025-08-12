@@ -360,3 +360,63 @@ body {
   left: 0;
   right: 0;
 }
+
+/* src/styles/Tabs.css */
+
+.nav-tabs-simple {
+    border-bottom: 1px solid #374151; /* Темно-серая линия-разделитель */
+}
+
+.nav-tabs-simple .nav-link {
+    border: none;
+    background: transparent;
+    color: #9ca3af; /* Неактивная вкладка */
+    margin-bottom: -1px;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid transparent;
+    transition: color 0.2s, border-color 0.2s;
+}
+.nav-tabs-simple .nav-link:hover {
+    color: #ffffff; /* Наведение мыши */
+}
+
+/* Убираем стандартные стили Bootstrap для вкладок */
+.segmented-control {
+  border-bottom: none;
+  gap: 12px; /* Расстояние между кнопками */
+}
+
+/* Стили для каждой кнопки-вкладки */
+.segmented-control .nav-link {
+  /* Обводка */
+  border: 1px solid #4B5563; /* Темно-серая обводка */
+
+  /* Цвета неактивного состояния */
+  background-color: transparent; /* Прозрачный фон */
+  color: #D1D5DB; /* Светло-серый ("около белого") текст */
+
+  /* Внешний вид и анимация */
+  padding: 8px 20px;
+  border-radius: 10px; 
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+  line-height: 1.5;
+}
+
+/* Эффект при наведении на неактивную кнопку */
+.segmented-control .nav-link:not(.active):hover {
+  background-color: #374151;
+  color: #ffffff;
+}
+
+/*
+ * Стили для НАЖАТОЙ (активной) кнопки
+ */
+.segmented-control .nav-link.active {
+  background-color: #ffffff; /* Белый фон */
+  color: #111827;           /* Черный текст */
+  border-color: #ffffff;      /* Убираем видимость обводки, делая ее белой */
+  font-weight: 600;
+}
+
