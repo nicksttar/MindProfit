@@ -16,11 +16,15 @@ mongoose
 // Роуты
 const authRoutes = require("./routes/auth");
 const okxRoutes = require("./routes/okx");
-const binanceRoutes = require("./routes/binance"); 
+const binanceRoutes = require("./routes/binance");
+const projectsRoutes = require("./routes/projects");
+const usersRoutes = require("./routes/users");
 
 app.use("/api/auth", authRoutes);
 app.use("/api/okx", okxRoutes);
-app.use("/api/binance", binanceRoutes); 
+app.use("/api/binance", binanceRoutes);
+app.use("/api/projects", projectsRoutes);
+app.use("/api/users", usersRoutes); // <-- ВОТ ЭТА СТРОКА БЫЛА ПРОПУЩЕНА
 
 // Запуск сервера
 app.listen(5000, () => {
