@@ -1,9 +1,8 @@
-// src/services/geminiApi.js
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
 const genAI = new GoogleGenerativeAI(process.env.REACT_APP_GEMINI_API_KEY);
 
-// Обновленная функция, теперь включает bollingerBandsData
+// Ваша существующая функция для анализа сигналов
 export const getAiSignalAnalysis = async (pair, priceData, maData, levels, news, bollingerBandsData) => {
   if (!priceData || !maData || !levels || !bollingerBandsData || priceData.length === 0) {
     return { error: "Недостаточно технических данных для анализа." };
@@ -25,7 +24,6 @@ export const getAiSignalAnalysis = async (pair, priceData, maData, levels, news,
     ? news.map(article => `- ${article.title}`).join('\n')
     : "Нет свежих новостей.";
 
-  // Добавляем данные по полосам Боллинджера в промпт
   const lastBB = bollingerBandsData[bollingerBandsData.length - 1];
   const bollingerSummary = `
     - Полосы Боллинджера:
@@ -82,4 +80,70 @@ export const getAiSignalAnalysis = async (pair, priceData, maData, levels, news,
     console.error("Ошибка при получении или парсинге анализа от Gemini AI:", error);
     return { error: "Не удалось обработать ответ от AI." };
   }
+};
+
+
+/**
+ * ✨ ОБНОВЛЕННАЯ ФУНКЦИЯ ✨
+ * Генерирует уникальную тему, а затем на ее основе создает крипто-портфель.
+ */
+export const generateCryptoPortfolio = async () => {
+    const model = genAI.getGenerativeModel({
+        model: "gemini-1.5-flash",
+        generationConfig: {
+            temperature: 0.9,
+        }
+    });
+
+    try {
+        // --- ШАГ 1: Генерируем уникальную тему ---
+        const themePrompt = `
+            Ты — креативный крипто-инвестор. Придумай одну уникальную и интересную тему для крипто-портфеля.
+            Примеры тем: "DeFi гиганты", "Игровые миры (GameFi)", "Конкуренты Ethereum", "Проекты на стыке AI и блокчейна".
+            Ответь только названием темы, без лишних слов, кавычек или объяснений.
+        `;
+        
+        const themeResult = await model.generateContent(themePrompt);
+        const themeResponse = await themeResult.response;
+        const generatedTheme = themeResponse.text().trim(); // Получаем и очищаем тему
+
+        // --- ШАГ 2: Используем сгенерированную тему для создания портфеля ---
+        const portfolioPrompt = `
+            Ты — опытный крипто-инвестор, который создает тематические портфели.
+            Твоя задача — сгенерировать 1 креативный, крипто-портфель на основе следующей темы: "${generatedTheme}".
+            
+            Придумай броское название для портфеля, которое отражает эту тему.
+            Напиши короткое описание идеи портфеля в одно предложение.
+            Распредели 100% между 4-5 популярными и релевантными теме криптовалютами. Не используй вымышленные монеты.
+
+            Верни ответ в виде чистого JSON-объекта следующей структуры:
+            {
+              "name": "Название твоего портфеля",
+              "description": "Краткое описание идеи портфеля в одно предложение.",
+              "assets": [
+                {
+                  "coin": "Название криптовалюты",
+                  "ticker": "Ее тикер (например, BTC)",
+                  "allocation": "Процентное соотношение (например, 40%)"
+                }
+              ]
+            }
+        `;
+
+        const portfolioResult = await model.generateContent(portfolioPrompt);
+        const portfolioResponse = await portfolioResult.response;
+        let text = portfolioResponse.text();
+
+        // Очистка ответа, если он обернут в markdown
+        if (text.includes('```json')) {
+            text = text.substring(text.indexOf('{'), text.lastIndexOf('}') + 1);
+        }
+
+        const jsonResponse = JSON.parse(text);
+        return jsonResponse;
+
+    } catch (error) {
+        console.error("Ошибка при генерации крипто-портфеля от Gemini AI:", error);
+        return { error: "Не удалось сгенерировать идею для портфеля." };
+    }
 };
