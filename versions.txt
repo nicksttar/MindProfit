@@ -26,3 +26,22 @@
 *src/pages/TradingBotsView.js - создан новый раздел с торговыми ботами (заглушка)
 *src/App.css - добалены стили
 *src/App.js - сделали шапку в мобильной версии
+
+1.3 Добавили сложную механику в src/pages/SignalsView.js и небольшие фиксы
+
+*public/index.html - теперь у проекта есть название
+*src/hooks/useChart.js - создан файл для создания графика
+*src/pages/Signals - создана папка со всеми компоненати вкладки "Сигналы"
+*src/pages/Signals/PairSelector.js - создан файл для выбора пары актива 
+*src/pages/Signals/SignalAnalysis.js - создан файл для аналитики сигнала "мозг" вкладки
+*src/pages/Signals/TradingChart.js - создан файл для отображения графика актива
+*src/pages/SignalsView.js - файл модифицирован - собирает прошлые компоненты в одну страницу
+*src/services - создана папка с сервисами
+*src/services/binanceApi.js - создан файл для коректной работы TradingChart.js
+*src/services/geminiApi.js - создан файл ии аналитика
+*src/services/newsApi.js - создан файл новостных апи
+*src/store/useStore.js - создан файл поддержки
+*src/dark-theme.css - создан файл стилей для вкладки "Сигналы"
+*src/index.js - файл модифицирован - добавили dark-theme.css
+
+//на момент тестов исправно работает весь функционал

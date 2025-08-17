@@ -1,0 +1,121 @@
+/* --- Общая темно-синяя тема --- */
+body {
+  background: linear-gradient(to right, #0f0c29, #302b63, #24243e) !important;
+  /* 1. Делаем текст ярче */
+  color: #f0f0f0 !important;
+}
+
+.card {
+  background-color: rgba(22, 28, 39, 0.8) !important;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 15px !important;
+}
+
+/* Улучшаем цвет текста в карточках */
+.card-body, .card-header, .card-footer {
+    color: #f0f0f0 !important;
+}
+
+.list-group-item {
+  background-color: #1c222e !important;
+  color: #f0f0f0 !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.list-group-item.active {
+  background-color: #3d5af1 !important;
+  border-color: #3d5af1 !important;
+}
+
+.form-control, .form-select {
+    background-color: #1c222e !important;
+    color: #f0f0f0 !important;
+    border-color: #4a5568 !important;
+}
+
+.form-control::placeholder {
+    color: #a0aec0 !important;
+}
+
+.form-control:focus, .form-select:focus {
+    box-shadow: 0 0 0 0.25rem rgba(61, 90, 241, 0.25) !important;
+    border-color: #3d5af1 !important;
+}
+
+.input-group-text {
+    background-color: #2d3748 !important;
+    border-color: #4a5568 !important;
+}
+
+/* --- 2. Новая анимация для кнопки (бегающий бордер) --- */
+.animated-button-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem 0;
+}
+
+.gradient-button-wrapper {
+  position: relative;
+  border-radius: 14px; /* Чуть больше, чем у кнопки */
+  padding: 2px; /* Толщина рамки */
+  overflow: hidden;
+  z-index: 1;
+}
+
+.gradient-button-wrapper::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: conic-gradient(
+    from 180deg at 50% 50%,
+    #3d5af1, #a777e3, #e064b7, #3d5af1
+  );
+  z-index: -2;
+  animation: rotate-gradient 4s linear infinite;
+}
+
+.gradient-button-wrapper .btn {
+  background: #161c27; /* Фон самой кнопки */
+  color: white;
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-weight: bold;
+  border: none;
+  width: 100%;
+}
+
+.gradient-button-wrapper .btn:disabled {
+    opacity: 0.6;
+}
+/* --- Стили для новой шапки (добавьте в конец файла) --- */
+.navbar-brand.gradient-text {
+  font-size: 1.75rem; /* Делаем текст крупнее */
+  font-weight: 700;
+  background: linear-gradient(90deg, #a777e3, #3d5af1, #e064b7, #a777e3);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradient-text-animation 8s linear infinite;
+  background-size: 200% auto; /* Увеличиваем размер фона для плавной анимации */
+}
+
+@keyframes gradient-text-animation {
+  0% {
+    background-position: 200% center;
+  }
+  100% {
+    background-position: 0% center;
+  }
+}
+
+.navbar {
+    /* Добавляем тонкую границу под шапкой */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 1rem;
+}
+
