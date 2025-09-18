@@ -3,8 +3,9 @@
 import React, { useState } from 'react';
 import PortfolioView from './PortfolioView';
 import SignalsView from './SignalsView';
-import TradingBotsView from './TradingBotsView';
-import CurrentProjectsView from './CurrentProjectsView';
+import PineScripts from './PineScripts';
+import CurrentProjectsView from './CurrentProjectsView'
+import PnlPge from './Pnl';
 import '../App.css'; // Убедитесь, что стили подключены
 
 const MainView = ({ userId }) => {
@@ -18,10 +19,12 @@ const MainView = ({ userId }) => {
                 return <PortfolioView userId={userId} />;
             case 'signals':
                 return <SignalsView userId={userId} />;
-            case 'bots':
-                return <TradingBotsView userId={userId} />;
+            case 'pine-scripts':
+                return <PineScripts />;
             case 'projects':
                 return <CurrentProjectsView userId={userId} />;
+            case 'pnl':
+                return <PnlPge userId={userId} />;
             default:
                 return <PortfolioView userId={userId} />;
         }
@@ -52,8 +55,13 @@ const MainView = ({ userId }) => {
         </button>
     </li>
     <li className="nav-item">
-        <button className={getTabClassName('bots')} onClick={() => setActiveTab('bots')}>
-            Трейдинг боты
+        <button className={getTabClassName('pnl')} onClick={() => setActiveTab('pnl')}>
+            PNL
+        </button>
+    </li>
+    <li className="nav-item">
+        <button className={getTabClassName('pine-scripts')} onClick={() => setActiveTab('pine-scripts')}>
+            Pine Scripts
         </button>
     </li>
     <li className="nav-item">
