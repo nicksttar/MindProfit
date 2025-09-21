@@ -6,6 +6,7 @@ import SignalsView from './SignalsView';
 import PineScripts from './PineScripts';
 import CurrentProjectsView from './CurrentProjectsView'
 import PnlPge from './Pnl';
+import Analytic from './Analytic';
 import '../App.css'; // Убедитесь, что стили подключены
 
 const MainView = ({ userId }) => {
@@ -21,6 +22,8 @@ const MainView = ({ userId }) => {
                 return <SignalsView userId={userId} />;
             case 'pine-scripts':
                 return <PineScripts />;
+            case 'analytics':
+                return <Analytic />;
             case 'projects':
                 return <CurrentProjectsView userId={userId} />;
             case 'pnl':
@@ -52,6 +55,11 @@ const MainView = ({ userId }) => {
     <li className="nav-item">
         <button className={getTabClassName('signals')} onClick={() => setActiveTab('signals')}>
             Сигналы
+        </button>
+    </li>
+    <li className="nav-item">
+        <button className={getTabClassName('analytics')} onClick={() => setActiveTab('analytics')}>
+            Аналитика
         </button>
     </li>
     <li className="nav-item">

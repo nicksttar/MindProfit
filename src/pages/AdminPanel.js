@@ -39,9 +39,12 @@ const AdminPanel = () => {
         e.preventDefault();
         setIsSubmitting(true);
         setMessage('');
+
         try {
+            // ВОССТАНОВЛЕНО: Отправка обычного JSON
             await axios.post('http://localhost:5000/api/projects', formData);
             setMessage('Проект успешно добавлен!');
+            // ВОССТАНОВЛЕНО: Простая очистка формы
             setFormData({ title: '', description: '', link: '' });
             fetchProjects();
         } catch (err) {
