@@ -1,21 +1,27 @@
 // src/pages/TradingBotsView.js
 import React, { useState } from 'react';
+// ИЗМЕНЕНО: Импортируем иконки из lucide-react
+import { Copy, ClipboardCheck, HelpCircle, CircleQuestionMark } from 'lucide-react';
 
-// --- Иконки для кнопок ---
-const CopyIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-clipboard" viewBox="0 0 16 16">
-        <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/>
-        <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/>
-    </svg>
-);
+// ИЗМЕНЕНО: Добавлен компонент модального окна
+const Modal = ({ isOpen, onClose, title, children }) => {
+    if (!isOpen) return null;
 
-const CheckIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-clipboard-check" viewBox="0 0 16 16">
-        <path fillRule="evenodd" d="M10.854 7.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7.5 9.793l2.646-2.647a.5.5 0 0 1 .708 0z"/>
-        <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/>
-        <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/>
-    </svg>
-);
+    return (
+        <div className="modal" style={{ display: 'block', backgroundColor: 'rgba(0, 0, 0, 0.7)' }}>
+            <div className="modal-dialog modal-dialog-centered">
+                {/* ИЗМЕНЕНО: Фон модального окна сделан светлее и добавлена тень для контраста */}
+                <div className="modal-content" style={{ backgroundColor: '#161B22', border: '1px solid #30363D', boxShadow: '0 5px 15px rgba(0,0,0,0.5)' }}>
+                    <div className="modal-header border-bottom-0">
+                        <h5 className="modal-title text-white ps-2">{title}</h5>
+                        <button type="button" className="btn-close btn-close-white" onClick={onClose}></button>
+                    </div>
+                    <div className="modal-body">{children}</div>
+                </div>
+            </div>
+        </div>
+    );
+};
 
 // Данные со скриптами
 // ИЗМЕНЕНО: Добавлены данные бэктеста для каждой стратегии
@@ -96,6 +102,7 @@ const PineScripts = ({ userId }) => {
     // Новое состояние для отслеживания полностью раскрытых скриптов
     // Используем Set для удобного добавления/удаления ID
     const [fullyExpanded, setFullyExpanded] = useState(new Set());
+    const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
 
     const handleCopy = (script) => {
         navigator.clipboard.writeText(script.code).then(() => {
@@ -121,10 +128,29 @@ const PineScripts = ({ userId }) => {
 
     return (
         <div className="container-fluid px-0">
-            <div className="text-center mb-5">
-                <h2 className="fw-bold">🤖 Готовые Pine-скрипты</h2>
-                <p className="lead" style={{ color: '#9CA3AF' }}>Используйте эти скрипты в TradingView для тестирования стратегий.</p>
+            <div className="text-center mb-4">
+                {/* ИЗМЕНЕНО: Добавлена обертка и кнопка помощи */}
+                <div className="d-flex justify-content-center align-items-center gap-2">
+                    <p className="lead mb-0" style={{ color: '#9CA3AF' }}>Используйте эти скрипты в TradingView для тестирования стратегий.</p>
+                    <button className="btn p-0 border-0" onClick={() => setIsHelpModalOpen(true)}>
+                        <CircleQuestionMark size={18} color="#6c757d" />
+                    </button>
+                </div>
             </div>
+
+            {/* ИЗМЕНЕНО: Добавлено модальное окно */}
+            <Modal 
+                isOpen={isHelpModalOpen} 
+                onClose={() => setIsHelpModalOpen(false)} 
+                title="Как использовать скрипты?"
+            >
+                <ol className="list-group list-group-numbered">
+                    <li className="list-group-item bg-transparent text-white border-0">Скопируйте нужный скрипт.</li>
+                    <li className="list-group-item bg-transparent text-white border-0">Откройте и зарегистрируйтесь на <a href="https://www.tradingview.com/" target="_blank" rel="noopener noreferrer">TradingView</a>.</li>
+                    <li className="list-group-item bg-transparent text-white border-0">Откройте график любой пары (например, BTC/USDT) и внизу найдите вкладку "Pine Editor".</li>
+                    <li className="list-group-item bg-transparent text-white border-0">Вставьте скопированный код в редактор и нажмите "Добавить на график".</li>
+                </ol>
+            </Modal>
 
             <div className="accordion" id="pineScriptsAccordion">
                 {pineScripts.map((script, index) => (
@@ -173,7 +199,10 @@ const PineScripts = ({ userId }) => {
                                     {/* --- КОНЕЦ --- */}
 
                                     <button onClick={() => handleCopy(script)} className="btn btn-sm btn-outline-light position-absolute top-0 end-0 m-2">
-                                        {copiedId === script.id ? <><CheckIcon /> Скопировано</> : <><CopyIcon /> Копировать</>}
+                                        {copiedId === script.id 
+                                            ? <><ClipboardCheck size={14} /> Скопировано</> 
+                                            : <><Copy size={14} /> Копировать</>
+                                        }
                                     </button>
                                 </div>
                                 
