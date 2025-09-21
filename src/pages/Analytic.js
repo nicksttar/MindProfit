@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 // --- НОВЫЙ КОМПОНЕНТ: Виджет общей капитализации ---
-const MarketCapWidget = ({ data, loading, error }) => {
-    if (loading) return <div className="stat-card p-4 text-center">Загрузка данных...</div>;
-    if (error) return <div className="stat-card p-4 text-center text-danger">{error}</div>;
+const MarketCapWidget = ({ data, error }) => {
+    // Убрана проверка на loading, так как она теперь выше
+    if (error) return <div className="stat-card p-4 text-center text-warning">{error}</div>;
     if (!data) return <div className="stat-card p-4 text-center">Нет данных.</div>;
 
     const marketCap = data.total_market_cap?.usd || 0;
@@ -27,9 +27,9 @@ const MarketCapWidget = ({ data, loading, error }) => {
     );
 };
 
-const MarketMovers = ({ data, loading, error }) => {
-    if (loading) return <div className="stat-card p-4 text-center">Загрузка лидеров...</div>;
-    if (error) return <div className="stat-card p-4 text-center text-danger">{error}</div>;
+const MarketMovers = ({ data, error }) => {
+    // Убрана проверка на loading
+    if (error) return <div className="stat-card p-4 text-center text-warning">{error}</div>;
     if (!data?.gainers || !data?.losers) return <div className="stat-card p-4 text-center">Нет данных.</div>;
 
     return (
@@ -63,9 +63,9 @@ const MarketMovers = ({ data, loading, error }) => {
     );
 };
 
-const ActiveCurrenciesWidget = ({ data, loading, error }) => {
-    if (loading) return <div className="stat-card p-4 text-center">Загрузка...</div>;
-    if (error) return <div className="stat-card p-4 text-center text-danger">{error}</div>;
+const ActiveCurrenciesWidget = ({ data, error }) => {
+    // Убрана проверка на loading
+    if (error) return <div className="stat-card p-4 text-center text-warning">{error}</div>;
     if (!data) return <div className="stat-card p-4 text-center">Нет данных.</div>;
 
     const activeCryptos = data.active_cryptocurrencies || 0;
@@ -85,9 +85,9 @@ const ActiveCurrenciesWidget = ({ data, loading, error }) => {
     );
 };
 
-const BtcDominance = ({ data, loading, error }) => {
-    if (loading) return <div className="stat-card p-4 text-center">Загрузка...</div>;
-    if (error) return <div className="stat-card p-4 text-center text-danger">{error}</div>;
+const BtcDominance = ({ data, error }) => {
+    // Убрана проверка на loading
+    if (error) return <div className="stat-card p-4 text-center text-warning">{error}</div>;
     if (!data) return <div className="stat-card p-4 text-center">Нет данных.</div>;
 
     const dominance = data.market_cap_percentage?.btc || 0;
@@ -112,9 +112,9 @@ const BtcDominance = ({ data, loading, error }) => {
     );
 };
 
-const EthGasWidget = ({ data, loading, error }) => {
-    if (loading) return <div className="stat-card p-4 text-center">Загрузка...</div>;
-    if (error) return <div className="stat-card p-4 text-center text-danger">{error}</div>;
+const EthGasWidget = ({ data, error }) => {
+    // Убрана проверка на loading
+    if (error) return <div className="stat-card p-4 text-center text-warning">{error}</div>;
     if (!data) return <div className="stat-card p-4 text-center">Нет данных.</div>;
 
     const ethPrice = data.ethPrice?.usd || 0;
@@ -160,7 +160,7 @@ function Analytic() {
                 const gainers = sorted.slice(-5).reverse();
                 setMarketMovers({ data: { gainers, losers }, loading: false, error: null });
             } catch (error) {
-                const errorMessage = 'Не удалось загрузить данные аналитики.';
+                const errorMessage = 'Высокая нагрузка на сервер. Данные появятся позже.';
                 setGlobalData({ data: null, loading: false, error: errorMessage });
                 setMarketMovers({ data: null, loading: false, error: errorMessage });
             }
@@ -168,6 +168,30 @@ function Analytic() {
 
         fetchAnalyticsData();
     }, []);
+
+    // --- НАЧАЛО ИЗМЕНЕНИЙ ---
+
+    // Если идет загрузка, показываем один большой спиннер
+    if (globalData.loading || marketMovers.loading) {
+        return (
+            <div className="text-center p-5">
+                <div className="spinner-border text-primary" role="status" style={{ width: '3rem', height: '3rem' }}></div>
+                <p className="mt-3 lead text-light" style={{ opacity: 0.75 }}>Загружаем данные аналитики...</p>
+            </div>
+        );
+    }
+
+    // Если есть ошибка, показываем одну большую заглушку вместо 6 виджетов
+    if (globalData.error) {
+        return (
+            <div className="stat-card p-5 text-center">
+                <h4 className="text-warning">⚠️ Что-то пошло не так</h4>
+                <p className="text-light mt-2 mb-0" style={{ opacity: 0.75 }}>{globalData.error}</p>
+            </div>
+        );
+    }
+
+    // --- КОНЕЦ ИЗМЕНЕНИЙ ---
 
     return (
         <div>
@@ -177,32 +201,32 @@ function Analytic() {
             <div className="row g-4 mb-4">
                 {/* ИЗМЕНЕНО: Виджет капитализации */}
                 <div className="col-lg-4 col-md-6">
-                    <MarketCapWidget {...globalData} />
+                    <MarketCapWidget data={globalData.data} error={globalData.error} />
                 </div>
 
                 {/* Виджет: Доминация BTC */}
                 <div className="col-lg-4 col-md-6">
-                    <BtcDominance {...globalData} />
+                    <BtcDominance data={globalData.data} error={globalData.error} />
                 </div>
 
                 {/* Виджет: Лидеры роста и падения */}
                 <div className="col-lg-4 col-md-12">
-                    <MarketMovers {...marketMovers} />
+                    <MarketMovers data={marketMovers.data} error={marketMovers.error} />
                 </div>
             </div>
             <div className="row g-4">
                 {/* НОВЫЙ ВИДЖЕТ: Цена ETH и газ */}
                 <div className="col-lg-4 col-md-6">
-                    <EthGasWidget {...globalData} />
+                    <EthGasWidget data={globalData.data} error={globalData.error} />
                 </div>
                 {/* НОВЫЙ ВИДЖЕТ: Объем торгов */}
                 <div className="col-lg-4 col-md-6">
                     {/* Можно создать отдельный компонент, но для простоты пока так */}
-                    <MarketCapWidget data={{ total_market_cap: globalData.data?.total_volume, market_cap_change_percentage_24h_usd: 0 }} loading={globalData.loading} error={globalData.error} />
+                    <MarketCapWidget data={{ total_market_cap: globalData.data?.total_volume, market_cap_change_percentage_24h_usd: 0 }} error={globalData.error} />
                 </div>
                 {/* НОВЫЙ ВИДЖЕТ: Активные криптовалюты */}
                 <div className="col-lg-4 col-md-6">
-                    <ActiveCurrenciesWidget {...globalData} />
+                    <ActiveCurrenciesWidget data={globalData.data} error={globalData.error} />
                 </div>
             </div>
         </div>
